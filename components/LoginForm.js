@@ -1,29 +1,28 @@
 // /app/login/LoginForm.js
 
-'use client';
-
 import { useState } from 'react';
-import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import { useDispatch, useSelector } from 'react-redux';
+import { login } from '@/slices/authSlice';
 
 export default function LoginForm() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState(null);
   const router = useRouter();
+  const dispatch = useDispatch();
+  const error = useSelector((state) => state.auth.error);
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    try {
-      const response = await axios.post('/api/auth/login', { username, password });
-      if (response.status === 200) {
-        // Handle successful login, redirect to the home page or another page
+    console.log(username, password);
+    dispatch(login({ username, password })) // Dispatching the login thunk action
+      .unwrap()
+      .then(() => {
         router.push('/general');
-      }
-    } catch (err) {
-      // Set error message
-      setError('Invalid username or password. Please try again.');
-    }
+      })
+      .catch((error) => {
+        console.log('Login failed: ', error);
+      });
   };
 
   return (
@@ -57,7 +56,7 @@ export default function LoginForm() {
           className="w-full px-4 py-2 mt-1 border rounded-md focus:ring-2 focus:ring-blue-500"
         />
       </div>
-      <button type="submit" className="w-full py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600">
+      <button onClick={handleLogin} className="w-full py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600">
         Login
       </button>
     </form>

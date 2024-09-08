@@ -1,5 +1,4 @@
 import { Inter } from 'next/font/google';
-import './globals.css';
 import HeroHeader from './HeroHeader';
 import NavBar from './NavBar';
 
@@ -12,13 +11,10 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        {/* <HeroHeader /> */}
-        <h1>test 2</h1>
-        {/* <NavBar /> */}
-        {children}
-      </body>
-    </html>
+    <div>
+      <HeroHeader />
+      <NavBar />
+      {children}
+    </div>
   );
 }
