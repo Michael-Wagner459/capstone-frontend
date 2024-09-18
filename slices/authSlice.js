@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from '../axios';
+import { useDispatch } from 'react-redux';
 
 //Asycn thunk for registering new user
 export const register = createAsyncThunk(
@@ -26,10 +27,9 @@ export const login = createAsyncThunk('auth/login', async ({ username, password 
 });
 
 // Async thunk for refreshing the access token
-export const refreshAccessToken = createAsyncThunk('auth/refreshToken', async (_, { getState, rejectWithValue }) => {
-  const refreshToken = getState().auth.refreshToken;
+export const refreshAccessToken = createAsyncThunk('auth/refreshToken', async (_, { rejectWithValue }) => {
   try {
-    const response = await axios.post('/auth/token', { token: refreshToken }, { withCredentials: true });
+    const response = await axios.post('/auth/token', null, { withCredentials: true });
     localStorage.setItem('accessToken', response.data.accessToken);
     return response.data;
   } catch (error) {
@@ -50,7 +50,7 @@ export const validateToken = createAsyncThunk('auth/validateToken', async (_, { 
         Authorization: `Bearer ${token}`,
       },
     });
-    return { accessToken: token, user: response.data.user };
+    return response.data;
   } catch (error) {
     localStorage.removeItem('accessToken'); // Clear token if invalid
     return rejectWithValue(error.response?.data.message || 'Failed to validate token');
@@ -113,6 +113,7 @@ const authSlice = createSlice({
       })
       .addCase(refreshAccessToken.fulfilled, (state, action) => {
         state.accessToken = action.payload.accessToken;
+        state.error = null;
       })
       .addCase(refreshAccessToken.rejected, (state, action) => {
         state.error = action.payload;
@@ -125,16 +126,17 @@ const authSlice = createSlice({
         state.isAuthenticated = true;
         state.user = action.payload.user;
         state.accessToken = action.payload.accessToken;
+        state.error = null;
       })
       .addCase(validateToken.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
         state.isAuthenticated = false;
       })
       .addCase(logout.fulfilled, (state) => {
         state.user = null;
         state.accessToken = null;
         state.isAuthenticated = false;
+        state.error = null;
       })
       .addCase(logout.rejected, (state, action) => {
         state.error = action.payload;

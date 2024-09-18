@@ -14,7 +14,6 @@ export default function LoginForm() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    console.log(username, password);
     dispatch(login({ username, password })) // Dispatching the login thunk action
       .unwrap()
       .then(() => {

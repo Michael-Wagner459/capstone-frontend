@@ -5,35 +5,34 @@ import { refreshAccessToken, logout } from './slices/authSlice';
 // Setting up an Axios instance with a base URL so you don't have to repeatedly specify it
 const instance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_BASE_URL,
+  withCredentials: true,
 });
 
-// Attach interceptors to the created Axios instance, not the default Axios object
+// Add a response interceptor to handle token expiration
 instance.interceptors.response.use(
-  (response) => response,
+  (response) => response, // If the response is successful, return it
   async (error) => {
     const originalRequest = error.config;
-    // Check for 401 status and if the request has not been retried yet
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      const errorCode = error.response.data.code;
+    // Check if the error status is 401 (Unauthorized) and the request is not retried yet
+    if (error.response?.data.code === 'INVALID_TOKEN' && !originalRequest._retry) {
+      originalRequest._retry = true;
+      console.log(originalRequest._retry);
+      try {
+        // Attempt to refresh the token
+        await store.dispatch(refreshAccessToken()).unwrap();
 
-      // Only retry for a specific error code
-      if (errorCode === 'INVALID_TOKEN') {
-        originalRequest._retry = true;
-        try {
-          // Use the instance to retry the original request to maintain the base URL and any other configured settings
-          await store.dispatch(refreshAccessToken()).unwrap();
-          return instance(originalRequest);
-        } catch (refreshError) {
-          // Token refresh failed, handle it, e.g., by logging out
-          store.dispatch(logout());
-          return Promise.reject(refreshError);
-        }
-      } else {
-        // For other 401 errors, handle them differently or pass them along
-        return Promise.reject(error);
+        // Retry the original request with the new token
+        const newAccessToken = store.getState().auth.accessToken;
+        originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+        return instance(originalRequest);
+      } catch (refreshError) {
+        // Refresh failed, logout or handle accordingly
+        store.dispatch(logout());
+        return Promise.reject(refreshError);
       }
     }
 
+    // If the error is not 401 or the token refresh fails, reject the error
     return Promise.reject(error);
   }
 );
