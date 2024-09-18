@@ -29,7 +29,12 @@ export const login = createAsyncThunk('auth/login', async ({ username, password 
 // Async thunk for refreshing the access token
 export const refreshAccessToken = createAsyncThunk('auth/refreshToken', async (_, { rejectWithValue }) => {
   try {
-    const response = await axios.post('/auth/token', null, { withCredentials: true });
+    const response = await axios.post('/auth/token', null, {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
+      },
+    });
     localStorage.setItem('accessToken', response.data.accessToken);
     return response.data;
   } catch (error) {
@@ -60,7 +65,12 @@ export const validateToken = createAsyncThunk('auth/validateToken', async (_, { 
 // Async thunk for logging out
 export const logout = createAsyncThunk('auth/logout', async (_, { rejectWithValue }) => {
   try {
-    await axios.post('/auth/logout', null, { withCredentials: true });
+    await axios.post('/auth/logout', null, {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
+      },
+    });
     localStorage.removeItem('accessToken');
     return;
   } catch (error) {
