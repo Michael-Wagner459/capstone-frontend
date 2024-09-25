@@ -102,7 +102,7 @@ const PostPage = () => {
       ) : (
         <div>
           {/* Post Content */}
-          <div className="bg-white shadow-md rounded p-6 mb-4">
+          <div className="shadow-md rounded p-6 mb-4">
             <h1 className="text-3xl font-bold mb-2">{post?.title}</h1>
             <p className="text-gray-700 mb-4">Posted by: {post?.author.username}</p>
 
@@ -142,7 +142,7 @@ const PostPage = () => {
           </div>
 
           {/* Comments Section */}
-          <div className="bg-white shadow-md rounded p-6 mb-4">
+          <div className="shadow-md rounded p-6 mb-4">
             <h2 className="text-2xl font-bold mb-4">Comments</h2>
             {comments?.map((comment) => {
               const canEditComment = user && comment.author._id === user.id;

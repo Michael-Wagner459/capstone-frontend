@@ -4,9 +4,9 @@ import Link from 'next/link';
 const VerifyEmail = () => {
   return (
     <div className="flex justify-center items-center h-screen bg-gray-100">
-      <div className="bg-white p-8 rounded-md shadow-lg max-w-md text-center">
-        <h1 className="text-2xl font-bold mb-4">Verify Your Email</h1>
-        <p className="mb-4">
+      <div className="bg-white p-8 rounded-md shadow-lg max-w-md text-center ">
+        <h1 className="text-2xl font-bold mb-4 text-black">Verify Your Email</h1>
+        <p className="mb-4 text-black">
           A verification link has been sent to your email. Please verify your email before logging in.
         </p>
         <Link href="/login">
