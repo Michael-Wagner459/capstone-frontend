@@ -67,14 +67,12 @@ export const validateToken = createAsyncThunk('auth/validateToken', async (_, { 
 export const logout = createAsyncThunk('auth/logout', async (_, { rejectWithValue }) => {
   const token = localStorage.getItem('accessToken');
   try {
-    console.log('send logout to backend');
     await axios.post('/auth/logout', null, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
       },
     });
-    console.log('logout complete');
     localStorage.removeItem('accessToken');
     return;
   } catch (error) {
