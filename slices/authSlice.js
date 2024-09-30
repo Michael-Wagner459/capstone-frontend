@@ -28,6 +28,7 @@ export const login = createAsyncThunk('auth/login', async ({ username, password 
 
 // Async thunk for refreshing the access token
 export const refreshAccessToken = createAsyncThunk('auth/refreshToken', async (_, { rejectWithValue }) => {
+  const token = localStorage.getItem('accessToken');
   try {
     const response = await axios.post('/auth/token', null, {
       withCredentials: true,
@@ -64,6 +65,7 @@ export const validateToken = createAsyncThunk('auth/validateToken', async (_, { 
 
 // Async thunk for logging out
 export const logout = createAsyncThunk('auth/logout', async (_, { rejectWithValue }) => {
+  const token = localStorage.getItem('accessToken');
   try {
     console.log('send logout to backend');
     await axios.post('/auth/logout', null, {
